@@ -156,3 +156,7 @@ Thumbs.db
 # Common editor files
 *~
 *.swp
+
+src/scf_tools/data/_raw
+src/scf_tools/data/_source
+src/scf_tools/data/scf_processed.dta

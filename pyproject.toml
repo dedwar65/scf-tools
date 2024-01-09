@@ -28,7 +28,14 @@ classifiers = [
   "Typing :: Typed",
 ]
 dynamic = ["version"]
-dependencies = ["numpy", "scipy", "pandas", "matplotlib"]
+dependencies = [
+  "numpy",
+  "scipy",
+  "pandas",
+  "matplotlib",
+  "statsmodels",
+  "seaborn",
+]
 
 [project.optional-dependencies]
 test = ["pytest >=6", "pytest-cov >=3"]

@@ -18,8 +18,10 @@ def download_data(type="stata"):
 
     # Get the directory of the current file
     current_dir = Path(__file__).resolve().parent
+    data_dir = current_dir / "data"
     raw_dir = current_dir / "data/_raw"
     source_dir = current_dir / "data/_source"
+    data_dir.mkdir(exist_ok=True)
     raw_dir.mkdir(exist_ok=True)
     source_dir.mkdir(exist_ok=True)
 
