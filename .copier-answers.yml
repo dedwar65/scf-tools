@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 2023.12.21
+_commit: 2024.03.10
 _src_path: gh:scientific-python/cookie
 backend: hatch
 email: alanlujan91@gmail.com
@@ -7,7 +7,6 @@ full_name: Alan Lujan
 license: MIT
 org: alanlujan91
 project_name: scf-tools
-project_short_description:
-  Tools to download and analyze the Survey of Consumer Finances.
+project_short_description: Tools to download and analyze the Survey of Consumer Finances.
 url: https://github.com/alanlujan91/scf-tools
 vcs: true

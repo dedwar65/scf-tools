@@ -59,7 +59,7 @@ Changelog = "https://github.com/alanlujan91/scf-tools/releases"
 version.source = "vcs"
 build.hooks.vcs.version-file = "src/scf_tools/_version.py"
 
-[tool.hatch.env.default]
+[tool.hatch.envs.default]
 features = ["test"]
 scripts.test = "pytest {args}"
 
@@ -144,5 +144,6 @@ messages_control.disable = [
   "fixme",
   "line-too-long",
   "missing-module-docstring",
+  "missing-function-docstring",
   "wrong-import-position",
 ]
