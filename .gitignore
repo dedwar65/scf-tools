@@ -157,6 +157,4 @@ Thumbs.db
 *~
 *.swp
 
-src/scf_tools/data/_raw
-src/scf_tools/data/_source
-src/scf_tools/data/scf_processed.dta
+src/scf_tools/data/

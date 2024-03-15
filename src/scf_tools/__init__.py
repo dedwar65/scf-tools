@@ -1,5 +1,4 @@
-"""
-Copyright (c) 2024 Alan Lujan. All rights reserved.
+"""Copyright (c) 2024 Alan Lujan. All rights reserved.
 
 scf-tools: Tools to download and analyze the Survey of Consumer Finances.
 """

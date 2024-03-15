@@ -1,68 +1,124 @@
 from __future__ import annotations
 
+import logging
 import zipfile
 from pathlib import Path
 
 import requests
 
-url = "https://www.federalreserve.gov/econres/files/scfp"
-years = [str(i) for i in range(1989, 2023, 3)]
-endings = {"sas": ".zip", "stata": "s.zip", "csv": "excel.zip"}
+logging.basicConfig(level=logging.INFO)
+
+SCF_DATA_URL = "https://www.federalreserve.gov/econres/files/"
+FIRST_YEAR = 1989
+LAST_YEAR = 2022
+INTERVAL = 3
+YEARS_IN_SCF = set(range(FIRST_YEAR, LAST_YEAR, INTERVAL))
+FILE_TYPES = {"sas": ".zip", "stata": "s.zip", "csv": "excel.zip"}
+
+PKG_DIR = Path(__file__).resolve().parent
+DATA_DIR = PKG_DIR / "data"
+UNZIP_DIR = "_raw"
+ARCHIVE_DIR = "_zip"
+(DATA_DIR).mkdir(exist_ok=True)
+(DATA_DIR / UNZIP_DIR).mkdir(exist_ok=True)
+(DATA_DIR / ARCHIVE_DIR).mkdir(exist_ok=True)
 
 
-def download_data(type="stata"):
-    ending = endings.get(type)
+def check_year_file_type(year: int, file_type: str) -> bool:
+    if file_type not in FILE_TYPES:
+        msg = (
+            f"Invalid file type {file_type}. ",
+            "Expected 'sas', 'stata' or 'csv'.",
+        )
+        raise ValueError(msg)
 
-    if not ending:
-        raise ValueError("Invalid type. Expected 'csv', 'sas' or 'stata'")
+    if year not in YEARS_IN_SCF:
+        msg = (
+            f"Invalid year {year}. Expected a year in the range "
+            f"{FIRST_YEAR}-{LAST_YEAR} in intervals of {INTERVAL}."
+        )
+        raise ValueError(msg)
 
-    # Get the directory of the current file
-    current_dir = Path(__file__).resolve().parent
-    data_dir = current_dir / "data"
-    raw_dir = current_dir / "data/_raw"
-    source_dir = current_dir / "data/_source"
-    data_dir.mkdir(exist_ok=True)
-    raw_dir.mkdir(exist_ok=True)
-    source_dir.mkdir(exist_ok=True)
+
+def save_year_zip(
+    year: int,
+    file_type: str = "stata",
+    save_dir: str | None = None,
+    session=None,
+):
+    file_name = f"scfp{year}{FILE_TYPES[file_type]}"
+    file_url = f"{SCF_DATA_URL}{file_name}"
+    zip_path = save_dir / ARCHIVE_DIR / file_name
+
+    # Check if the file already exists
+    if zip_path.exists():
+        logging.info(f"File {file_name} already exists. Skipping download.")
+
+    else:
+        try:
+            response = session.get(file_url)
+            response.raise_for_status()
+            logging.info(f"File {file_name} has been downloaded successfully.")
+        except requests.exceptions.RequestException as err:
+            raise SystemExit(f"Failed to download scfp{file_name}: {err}")
+
+        with zip_path.open("wb") as f:
+            f.write(response.content)
+            logging.info(f"File {file_name} has been saved to the zip directory.")
+
+    return file_name
+
+
+def unzip_file(file_name, file_dir=None, save_dir=None):
+
+    local_file = file_dir / ARCHIVE_DIR / file_name
+    unzip_dir = save_dir / UNZIP_DIR
+    zip_file = unzip_dir / file_name
+
+    if zip_file.exists():
+        logging.info(f"File {file_name} already exists. Skipping extraction.")
+        return
+
+    try:
+        with zipfile.ZipFile(local_file, "r") as zip_ref:
+            zip_ref.extractall(unzip_dir)
+
+        logging.info(f"File {file_name} has been extracted to the raw directory.")
+
+    except zipfile.BadZipFile as e:
+        logging.info(f"An error occurred while extracting {file_name}: {e}")
+
+
+def make_dirs(save_dir):
+    save_dir.mkdir(exist_ok=True)
+    (save_dir / UNZIP_DIR).mkdir(exist_ok=True)
+    (save_dir / ARCHIVE_DIR).mkdir(exist_ok=True)
+
+
+def download_year(
+    year: int,
+    file_type: str = "stata",
+    save_dir: str | None = None,
+    session=None,
+):
+
+    save_dir = DATA_DIR if save_dir is None else Path(save_dir).resolve()
+    make_dirs(save_dir)
+
+    check_year_file_type(year, file_type)
+    file_name = save_year_zip(year, file_type, session=session, save_dir=save_dir)
+    unzip_file(file_name, file_dir=save_dir, save_dir=save_dir)
+
+
+def download_all_years(file_type: str = "stata", save_dir: str | None = None):
+
+    save_dir = DATA_DIR if save_dir is None else Path(save_dir).resolve()
+    make_dirs(save_dir)
 
     with requests.Session() as session:
-        for year in years:
-            file_url = f"{url}{year}{ending}"
-
-            # Define the local file path relative to the current file
-            local_file = source_dir / f"scfp{year}{ending}"
-
-            # Skip download if file already exists
-            if local_file.exists():
-                print(f"File {local_file.name} already exists. Skipping download.")
-                continue
-
-            print(f"Starting download of {local_file.name}...")
-
-            try:
-                response = session.get(file_url)
-
-                with open(local_file, "wb") as f:
-                    f.write(response.content)
-
-                print(f"File {local_file.name} has been downloaded successfully.")
-
-            except requests.exceptions.RequestException as e:
-                print(f"An error occurred while downloading {local_file.name}: {e}")
-                continue
-
-            # Extract the zip file
-            try:
-                with zipfile.ZipFile(local_file, "r") as zip_ref:
-                    zip_ref.extractall(raw_dir)
-
-                print(
-                    f"File {local_file.name} has been extracted to the raw directory."
-                )
-
-            except zipfile.BadZipFile as e:
-                print(f"An error occurred while extracting {local_file.name}: {e}")
+        for year in YEARS_IN_SCF:
+            download_year(year, file_type, session=session, save_dir=save_dir)
 
 
 if __name__ == "__main__":
-    download_data()
+    download_all_years()

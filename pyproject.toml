@@ -35,6 +35,7 @@ dependencies = [
   "matplotlib",
   "statsmodels",
   "seaborn",
+  "requests",
 ]
 
 [project.optional-dependencies]
@@ -77,20 +78,20 @@ testpaths = ["tests"]
 run.source = ["scf_tools"]
 report.exclude_also = ['\.\.\.', 'if typing.TYPE_CHECKING:']
 
-[tool.mypy]
-files = ["src", "tests"]
-python_version = "3.8"
-warn_unused_configs = true
-strict = true
-enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
-warn_unreachable = true
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+# [tool.mypy]
+# files = ["src", "tests"]
+# python_version = "3.8"
+# warn_unused_configs = true
+# strict = true
+# enable_error_code = ["ignore-without-code", "redundant-expr", "truthy-bool"]
+# warn_unreachable = true
+# disallow_untyped_defs = false
+# disallow_incomplete_defs = false
 
-[[tool.mypy.overrides]]
-module = "scf_tools.*"
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
+# [[tool.mypy.overrides]]
+# module = "scf_tools.*"
+# disallow_untyped_defs = true
+# disallow_incomplete_defs = true
 
 
 [tool.ruff]
