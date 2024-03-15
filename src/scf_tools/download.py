@@ -70,7 +70,6 @@ def save_year_zip(
 
 
 def unzip_file(file_name, file_dir=None, save_dir=None):
-
     local_file = file_dir / ARCHIVE_DIR / file_name
     unzip_dir = save_dir / UNZIP_DIR
     zip_file = unzip_dir / file_name
@@ -101,7 +100,6 @@ def download_year(
     save_dir: str | None = None,
     session=None,
 ):
-
     save_dir = DATA_DIR if save_dir is None else Path(save_dir).resolve()
     make_dirs(save_dir)
 
@@ -111,7 +109,6 @@ def download_year(
 
 
 def download_all_years(file_type: str = "stata", save_dir: str | None = None):
-
     save_dir = DATA_DIR if save_dir is None else Path(save_dir).resolve()
     make_dirs(save_dir)
 
