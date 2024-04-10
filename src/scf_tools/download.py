@@ -12,7 +12,7 @@ SCF_DATA_URL = "https://www.federalreserve.gov/econres/files/"
 FIRST_YEAR = 1989
 LAST_YEAR = 2022
 INTERVAL = 3
-YEARS_IN_SCF = set(range(FIRST_YEAR, LAST_YEAR, INTERVAL))
+YEARS_IN_SCF = set(range(FIRST_YEAR, LAST_YEAR + 1, INTERVAL))
 FILE_TYPES = {"sas": ".zip", "stata": "s.zip", "csv": "excel.zip"}
 
 PKG_DIR = Path(__file__).resolve().parent
