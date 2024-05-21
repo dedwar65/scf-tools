@@ -1,4 +1,4 @@
-# scf-tools
+# fedsurvey
 
 ```{toctree}
 :maxdepth: 2

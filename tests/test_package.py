@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import importlib.metadata
 
-import scf_tools as m
+import fedsurvey as m
 
 
 def test_version():
-    assert importlib.metadata.version("scf_tools") == m.__version__
+    assert importlib.metadata.version("fedsurvey") == m.__version__

@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import importlib.metadata
 
-project = "scf-tools"
+project = "fedsurvey"
 copyright = "2024, Alan Lujan"
 author = "Alan Lujan"
-version = release = importlib.metadata.version("scf_tools")
+version = release = importlib.metadata.version("fedsurvey")
 
 extensions = [
     "myst_parser",

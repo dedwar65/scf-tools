@@ -8,7 +8,9 @@ import nox
 
 DIR = Path(__file__).parent.resolve()
 
+nox.needs_version = ">=2024.3.2"
 nox.options.sessions = ["lint", "pylint", "tests"]
+nox.options.default_venv_backend = "uv|virtualenv"
 
 
 @nox.session
@@ -30,7 +32,7 @@ def pylint(session: nox.Session) -> None:
     # This needs to be installed into the package environment, and is slower
     # than a pre-commit check
     session.install(".", "pylint")
-    session.run("pylint", "scf_tools", *session.posargs)
+    session.run("pylint", "fedsurvey", *session.posargs)
 
 
 @nox.session
@@ -99,7 +101,7 @@ def build_api_docs(session: nox.Session) -> None:
         "--module-first",
         "--no-toc",
         "--force",
-        "../src/scf_tools",
+        "../src/fedsurvey",
     )
 
 
