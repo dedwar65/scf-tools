@@ -157,4 +157,4 @@ Thumbs.db
 *~
 *.swp
 
-src/scf_tools/data/
+src/fedsurvey/scf/data/
