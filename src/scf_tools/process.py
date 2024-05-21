@@ -86,7 +86,7 @@ df_new.replace([np.inf, -np.inf], np.nan, inplace=True)
 df = pd.concat([df, df_new], axis=1)
 
 df = df.filter(
-    regex="age|race|hhsex|edcl|married|lf|fin|income|equity|networth|asset|year|wgt",
+    regex="age|race|hhsex|edcl|married|lf|fin|inc|equity|networth|asset|year|wgt|savres",
 )
 
 # Save the processed DataFrame back to a .dta file
