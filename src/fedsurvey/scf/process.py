@@ -47,49 +47,40 @@ mappings = {
     },
 }
 
-scf_merged_labeled = pd.DataFrame()
-
-# Apply all mappings and transformations directly on the original DataFrame
-for column, mapping in mappings.items():
-    scf_merged_labeled[f"{column}_lbl"] = scf_merged[column].map(mapping)
-
-# Define labels for age groups
+# Create labels for age groups
 labels = [f"({i+1}-{i+5}]" for i in range(20, 95, 5)]
 
-# Create a new column 'age_lbl' with age groups
-scf_merged_labeled["age_lbl"] = pd.cut(
-    scf_merged["age"], bins=range(20, 100, 5), right=True, labels=labels
-)
+# Create a dictionary of all transformations
+transformations = {
+    # Label mappings
+    **{f"{col}_lbl": scf_merged[col].map(mapping) for col, mapping in mappings.items()},
+    # Age groups
+    "age_lbl": pd.cut(scf_merged["age"], bins=range(20, 100, 5), right=True, labels=labels),
+    # Financial calculations
+    "equityfin": scf_merged["equity"].div(scf_merged["fin"]).replace([np.inf, -np.inf], np.nan),
+    "finincome": scf_merged["fin"].div(scf_merged["income"]).replace([np.inf, -np.inf], np.nan),
+    "finmill": scf_merged["fin"] / 1_000_000,
+    "fillthou": scf_merged["fin"] / 1_000,
+    "incomemill": scf_merged["income"] / 1_000_000,
+    "incomethou": scf_merged["income"] / 1_000,
+    # Financial deciles
+    "findeciles": scf_merged.groupby("year")["fin"].transform(
+        lambda x: pd.qcut(x, q=10, duplicates="drop", labels=False)
+    ) / 10
+}
 
-# Calculate 'equitfin', 'fininc', 'finmill', 'fillthou', 'incomemill', 'incomethou' in one line
-scf_merged_labeled = scf_merged_labeled.assign(
-    equityfin=scf_merged["equity"]
-    .div(scf_merged["fin"], fill_value=np.nan)
-    .replace([np.inf, -np.inf], np.nan),
-    finincome=scf_merged["fin"]
-    .div(scf_merged["income"], fill_value=np.nan)
-    .replace([np.inf, -np.inf], np.nan),
-    finmill=scf_merged["fin"].div(1_000_000, fill_value=np.nan),
-    fillthou=scf_merged["fin"].div(1_000, fill_value=np.nan),
-    incomemill=scf_merged["income"].div(1_000_000, fill_value=np.nan),
-    incomethou=scf_merged["income"].div(1_000, fill_value=np.nan),
-)
+# Create labeled DataFrame in one go
+scf_merged_labeled = pd.DataFrame(transformations)
 
-scf_merged_labeled["findeciles"] = (
-    scf_merged.groupby("year")["fin"].transform(
-        lambda x: pd.qcut(x, q=10, duplicates="drop", labels=False),
-    )
-    / 10
-)
-
-
-scf_merged_labeled = scf_merged_labeled.replace([np.inf, -np.inf], np.nan)
-
-scf_merged = pd.concat([scf_merged, scf_merged_labeled], axis=1)
-
-scf_merged = scf_merged.filter(
+# Create two separate filtered DataFrames
+scf_merged_full = pd.concat([scf_merged, scf_merged_labeled], axis=1)
+scf_merged_full = scf_merged_full.filter(
     regex="age|race|hhsex|edcl|married|lf|fin|inc|equity|networth|asset|year|wgt|savres",
 )
 
-# Save the processed DataFrame back to a .dta file
-scf_merged.to_stata(current_dir / "data/scf_processed.dta", write_index=False)
+# Create a minimal version with only the specified columns
+scf_merged_minimal = scf_merged.filter(regex="age|edcl|fin|inc|networth|asset|year|wgt")
+
+# Save both processed DataFrames to .dta files
+scf_merged_full.to_stata(current_dir / "data/scf_processed.dta", write_index=False)
+scf_merged_minimal.to_stata(current_dir / "data/scf_processed_dc.dta", write_index=False)
